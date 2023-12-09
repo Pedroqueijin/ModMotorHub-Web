@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModMotorHub</title>
+    <link rel="icon" href="https://icones.pro/wp-content/uploads/2021/03/icone-de-voiture-symbole-png-rouge.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        footer {
+            padding: 20px 0;
+            background-color: #f5f5f5;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .search-box input[type="text"] {
+            width: 0;
+            padding: 10px;
+            transition: width 0.3s ease-in-out;
+            border: none;
+            border-bottom: 1px solid #aaa;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .search-box input[type="text"]:focus {
+            width: 200px;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="https://icones.pro/wp-content/uploads/2021/03/icone-de-voiture-symbole-png-rouge.png" alt="ModMotorHub Logo" width="30" height="30" class="d-inline-block align-top"> ModMotorHub
+                </a>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar...">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2866/2866321.png" alt="Search Icon" width="20" height="20" onclick="toggleSearch()">
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Início</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Mods</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Contato</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h1 class="jumbotron-heading">Bem-vindo ao ModMotorHub</h1>
+                <p class="lead text-muted">Descubra o mundo de mods de veículos criados pela comunidade para o Assetto Corsa</p>
+                <p>
+                    <a href="#" class="btn btn-primary">Descobrir</a>
+                </p>
+            </div>
+        </section>
+        <section class="mods">
+            <div class="container">
+                <div class="row mb-3">
+                    <div class="col text-end">
+                        <button class="btn btn-outline-secondary" onclick="sortMods()">Ordenar por Nome</button>
+                    </div>
+                </div>
+                <div class="row" id="mods-container">
+                    <!-- Cards dos mods -->
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="text-center">
+        <p>&copy; 2023 ModMotorHub. Todos os direitos reservados.</p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script>
+        const modsContainer = document.getElementById('mods-container');
+
+        function createModCard(title, description, thumbnail, downloadLink, imageLink) {
+            const colDiv = document.createElement('div');
+            colDiv.classList.add('col-md-4');
+
+            const cardDiv = document.createElement('div');
+            cardDiv.classList.add('card', 'mb-4', 'box-shadow');
+
+            const img = document.createElement('img');
+            img.classList.add('card-img-top');
+            img.src = thumbnail;
+            img.alt = 'Mod Thumbnail';
+
+            const cardBody = document.createElement('div');
+            cardBody.classList.add('card-body');
+
+            const cardTitle = document.createElement('h5');
+            cardTitle.classList.add('card-title');
+            cardTitle.textContent = title;
+
+            const cardText = document.createElement('p');
+            cardText.classList.add('card-text');
+            cardText.textContent = description;
+
+            const btnGroup = document.createElement('div');
+            btnGroup.classList.add('btn-group');
+
+            const viewBtn = document.createElement('a');
+            viewBtn.classList.add('btn', 'btn-sm', 'btn-outline-secondary');
+            viewBtn.textContent = 'Ver';
+            viewBtn.href = imageLink; // Link da imagem para o botão "Ver"
+            viewBtn.setAttribute('target', '_blank'); // Abre o link em uma nova aba
+
+            const downloadBtn = document.createElement('a');
+            downloadBtn.classList.add('btn', 'btn-sm', 'btn-outline-secondary');
+            downloadBtn.textContent = 'Baixar';
+            downloadBtn.href = downloadLink; // Link de download para o mod
+            downloadBtn.setAttribute('target', '_blank'); // Abre o link em uma nova aba
+
+            btnGroup.appendChild(viewBtn);
+            btnGroup.appendChild(downloadBtn);
+
+            const smallText = document.createElement('small');
+            smallText.classList.add('text-muted');
+            smallText.textContent = 'Recentemente adicionado';
+
+            cardBody.appendChild(cardTitle);
+            cardBody.appendChild(cardText);
+            cardBody.appendChild(btnGroup);
+            cardBody.appendChild(smallText);
+
+            cardDiv.appendChild(img);
+            cardDiv.appendChild(cardBody);
+
+            colDiv.appendChild(cardDiv);
+
+            return colDiv;
+        }
+
+        // Dados dos mods
+        const mods = [
+            { 
+                title: 'Nissan Silvia S15 GP Sport Street', 
+                description: 'Potência: 383 cv\nTorque: 48 kgfm\n0-100 km/h: 5s\nPeso: 1270 kg\nVersão: v1.0\nAno: 2000\nCreditos: SegaHellaFlush', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2023/02/preview-6.jpg', 
+                downloadLink: 'https://modsfire.com/16icvlQ97Dj10jY',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2023/02/preview-6.jpg'
+            },
+
+            { 
+                title: 'Toyota Supra A80 TBK', 
+                description: 'Potência: 502 cv\nTorque: 72.2 kgfm\n0-100 km/h: 5s\nPeso: 1505 kg\nVersão: N/D\nAno: 1993\nCreditos: Jaskier', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2023/09/preview-44.jpg', 
+                downloadLink: 'https://modsfire.com/n54spTqVwomiG74',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2023/09/preview-44.jpg'
+            },
+
+            { 
+                title: 'Nissan Silvia S13 (G-Corporation)', 
+                description: 'Potência: 421 cv\nTorque: 47.4 kgfm\n0-100 km/h: 5s\nPeso: 1215 kg\nVersão: N/D\nAno: 1993\nCreditos: Aspire', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2023/09/preview-37.jpg', 
+                downloadLink: 'https://modsfire.com/NTzMN5arITtNZIO',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2023/09/preview-37.jpg'
+            },
+
+            { 
+                title: 'Nissan GTR-R34 V-Spec - No Hesi Spec', 
+                description: 'Potência: 1237 cv\nTorque: 121 kgfm\n0-100 km/h: 1.9s\nPeso: 1560 kg\nVersão: v1.2\nAno: 2000\nCreditos: No Hesi, Hijacked', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2023/08/preview-89.jpg', 
+                downloadLink: 'https://modsfire.com/iV0XkmTLY7T1E3U',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2023/08/preview-89.jpg'
+            },
+
+            { 
+                title: 'Nissan GTR-R35 DKD - Darren Kelly', 
+                description: 'Potência: 1094 cv\nTorque: 126 kgfm\n0-100 km/h: N/D\nPeso: 1270 kg\nVersão: v1.0\nAno: 2012\nCreditos: Kain McGonagle', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2022/01/preview-41.jpg?w=1022', 
+                downloadLink: 'https://sharemods.com/uxxgw2zoahym/dkd_nissan_r35_gtr.rar.html',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2022/01/preview-41.jpg?w=1022'
+            },
+
+            { 
+                title: 'Nissan GTR-R33 Public AMF', 
+                description: 'Potência: 1087 cv\nTorque: 104.7 kgfm\n0-100 km/h: 3s\nPeso: 1301 kg\nVersão: v1.0\nAno: 1997\nCreditos: AMF-AntiMaterialFab', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2023/06/preview-96.jpg', 
+                downloadLink: 'https://sharemods.com/uxxgw2zoahym/dkd_nissan_r35_gtr.rar.html',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2023/06/preview-96.jpg'
+            },
+
+            { 
+                title: 'BMW M4 CS', 
+                description: 'Potência: 460 cv\nTorque: 60 kgfm\n0-100 km/h: 3.9s\nPeso: 1580 kg\nVersão: v2.0\nAno: 2017\nCreditos: Cony#7897', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2023/12/preview-37.jpg', 
+                downloadLink: 'https://modsfire.com/w1uF3M31J67kon5',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2023/12/preview-37.jpg'
+            },
+
+            { 
+                title: 'Toyota Supra JZA80 Paris Spec', 
+                description: 'Potência: 921 cv\nTorque: 76.9 kgfm\n0-100 km/h: N/D\nPeso: 1510 kg\nVersão: v1.8\nAno: 1997\nCreditos: KS and Arch x Paris', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2023/08/preview-100.jpg', 
+                downloadLink: 'https://modsfire.com/H8gn851cGa2gJk0',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2023/08/preview-100.jpg'
+            },
+
+            { 
+                title: 'Mazda RX-7 Veilside Fortune', 
+                description: 'Potência: 306 cv\nTorque: 35.38 kgfm\n0-100 km/h: N/D\nPeso: 1050 kg\nVersão: N/D\nAno: N/D\nCreditos: N/D', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2021/01/preview-20.jpg?w=1022', 
+                downloadLink: 'https://sharemods.com/8eo2w80ap41g/Mazda_RX-7_Veilside_Fortune_by_Assettogarage_for_AC_v1.14.3.7z.html',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2021/01/preview-20.jpg?w=1022'
+            },
+
+            { 
+                title: 'Nissan Silvia S14 Zenki 2.0 VDC', 
+                description: 'Potência: 1094 cv\nTorque: 125.8 kgfm\n0-100 km/h: N/D\nPeso: 1200 kg\nVersão: N/D\nAno: 1993\nCreditos: VDC', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2023/01/preview-46.jpg', 
+                downloadLink: 'https://modsfire.com/854S4iJze3N9i88',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2023/01/preview-46.jpg'
+            },
+
+            { 
+                title: 'Nissan GTR-R35 DAMP Public 2.0 VDC', 
+                description: 'Potência: 1066 cv\nTorque: 119.9 kgfm\n0-100 km/h: N/D\nPeso: 1289 kg\nVersão: N/D\nAno: 2017\nCreditos: VDC', 
+                thumbnail: 'https://brasilsimulatormods.com/wp-content/uploads/2022/10/preview-153.jpg', 
+                downloadLink: 'https://modsfire.com/ZU1IA9dfAn8wpT8',
+                imageLink: 'https://brasilsimulatormods.com/wp-content/uploads/2022/10/preview-153.jpg'
+            },
+        ];
+
+        function sortModsByName() {
+            mods.sort((a, b) => {
+                const titleA = a.title.toUpperCase();
+                const titleB = b.title.toUpperCase();
+                if (titleA < titleB) {
+                    return -1;
+                }
+                if (titleA > titleB) {
+                    return 1;
+                }
+                return 0;
+            });
+        }
+
+        function renderMods(modsArray) {
+            renderModsByName(modsArray);
+        }
+
+        function renderModsByName(modsArray) {
+            modsContainer.innerHTML = '';
+            modsArray.forEach(mod => {
+                const modCard = createModCard(mod.title, mod.description, mod.thumbnail, mod.downloadLink, mod.imageLink);
+                modsContainer.appendChild(modCard);
+            });
+        }
+
+        let isSortedByName = false;
+
+        function sortMods() {
+            if (!isSortedByName) {
+                sortModsByName();
+                renderModsByName(mods);
+                isSortedByName = true;
+            } else {
+                mods.reverse();
+                renderModsByName(mods);
+                isSortedByName = false;
+            }
+        }
+
+        function filterMods() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const cards = modsContainer.getElementsByClassName('col-md-4');
+
+            let noResults = true;
+            let resultsCount = 0; // Contador de resultados
+
+            for (let i = 0; i < cards.length; i++) {
+                const title = cards[i].querySelector('.card-title');
+                if (title.textContent.toUpperCase().indexOf(filter) > -1) {
+                    cards[i].style.display = '';
+                    noResults = false;
+                    resultsCount++; // Incrementa o contador de resultados
+                } else {
+                    cards[i].style.display = 'none';
+                }
+            }
+
+            const existingNoResultsMessage = modsContainer.querySelector('.col-12.text-center');
+            const existingResultCount = modsContainer.querySelector('.result-count');
+
+            if (noResults && !existingNoResultsMessage) {
+                const noResultsMessage = document.createElement('div');
+                noResultsMessage.classList.add('col-12', 'text-center', 'mt-3');
+                noResultsMessage.textContent = 'Nenhum resultado encontrado.';
+                modsContainer.appendChild(noResultsMessage);
+
+                if (existingResultCount) {
+                    existingResultCount.remove();
+                }
+            } else if (!noResults && existingNoResultsMessage) {
+                existingNoResultsMessage.remove();
+            }
+
+            if (resultsCount > 0) {
+                if (existingResultCount) {
+                    existingResultCount.textContent = `${resultsCount} resultado(s) encontrado(s)`;
+                } else {
+                    const resultCount = document.createElement('div');
+                    resultCount.classList.add('col-12', 'text-center', 'result-count');
+                    resultCount.textContent = `${resultsCount} resultado(s) encontrado(s)`;
+                    modsContainer.insertBefore(resultCount, modsContainer.firstChild);
+                }
+            } else if (existingResultCount) {
+                existingResultCount.remove();
+            }
+        }
+
+        function toggleSearch() {
+            const input = document.getElementById('searchInput');
+            input.focus();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderMods(mods);
+            document.getElementById('searchInput').addEventListener('keyup', filterMods);
+        });
+    </script>
+</body>
+
+</html>
